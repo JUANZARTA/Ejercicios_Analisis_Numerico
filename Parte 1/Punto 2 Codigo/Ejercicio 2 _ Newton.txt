@@ -1,0 +1,114 @@
+#include <iostream>
+#include <stdlib.h>
+#include <math.h>
+
+using namespace std;
+using std::cout;
+using std::endl;
+
+void lecturas(double* , int*);
+void newton(double , int);
+double eval_funcion(double);
+double eval_derfuncion(double);
+/****************************************************************************/
+
+int main()
+{
+ double vpo;
+ int vn = 0 ;
+ lecturas(&vpo , &vn);
+ newton(vpo , vn);
+ 
+ return 0;
+}
+/*****************************************************************************/
+
+void lecturas(double *po , int *N)
+{
+ cout<<" - N E W T O N - "<<endl;
+ cout<<"Digite la aproximacion inicial : "; cin>>*po;
+ cout<<"Digite el numero de iteraciones : "; cin>>*N;
+
+ while(*N<=2)
+ {
+  cout<<"La cantidad de iteraciones debe ser positiva (>2) "<<endl;
+  cout<<"Digite el numero de iteraciones : "; cin>>*N;
+ }
+}
+/****************************************************************************/
+
+void newton(double po, int N)
+{
+ double TOL=0.000000001 , ef=0.0 , edf=0.0, Er=0.0 , p=0.0 , c=0.0 , efp=0.0;
+ int i = 1 ; //el "paso 1"
+ cout<<"\n"<<"\t -- p -- "<<"\t\t -- f(p) -- "<<"\t\t-- Er -- ";
+
+ //el "paso 2"
+ while(i <= N)
+ {
+  ef = eval_funcion(po);
+  edf = eval_derfuncion(po);
+  c = ef / edf ; //   f(po) / f'(po)
+  p = po - c;    //el "paso 3"
+  efp = eval_funcion(p);
+  Er = (p - po)/p;    if(Er<0) Er=Er*(-1); //esto es para ayudar al paso 4
+
+
+  //presentacion de resultados iteracion a iteracion 
+  cout<<"\n"<<i<<"\t";
+  std::cout.setf( std::ios::fixed, std:: ios::floatfield );
+  std::cout << p;
+  std::cout.unsetf( std::ios::floatfield );
+  std::cout.precision(10);
+  std::cout<<"\t\t"; std::cout << efp;
+  std::cout<<"\t\t"; std::cout << Er;
+
+  //el "paso 4"
+  if(Er<TOL) {cout<<"\n\nProcedimiento completado satisfactoriamente\n"; system("pause"); exit(1);}
+
+  //el "paso 5"
+  i = i + 1;
+
+  //el "paso 6"  redefinicion de po
+  po = p;
+ }
+
+ //el "paso 7"
+ if((i>N)||(Er>TOL)) {cout<<"\nEl metodo fracaso despues de "<<N<<" iteraciones";}
+ cout<<"\n"; system("pause");
+}
+/****************************************************************************/
+
+// f(x) =  19x^6 + 3500x^5 + 426x^4 − 170x^3  
+//Entradas a probar para Raiz 1 : a = -0.4
+//Entradas a probar para Raiz 2 : a = -0.1
+//Entradas a probar para Raiz 3 : a = 0.2
+//Entradas a probar para Raiz 4 : a = -185
+
+double eval_funcion(double v)
+{
+   double a=0.0;
+   double b=0.0;
+   double c=0.0;
+   double d=0.0;
+   double r=0.0;
+   a = (19*v*v*v*v*v*v);
+   b = (3500*v*v*v*v*v);
+   c = (426*v*v*v*v);
+   d = (170*v*v*v);
+   r = a+b+c-d;
+   return r;
+}
+double eval_derfuncion(double z)
+{
+   double a=0.0;
+   double b=0.0;
+   double c=0.0;
+   double d=0.0;
+   double r=0.0;
+   a = (114*z*z*z*z*z);
+   b = (17.500*z*z*z*z);
+   c = (1.704*z*z*z);
+   d = (510*z*z);
+   r = a+b+c-d;
+}
