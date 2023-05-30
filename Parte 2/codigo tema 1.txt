@@ -1,0 +1,120 @@
+#include <iostream>
+#include <stdlib.h>
+#include <math.h>
+#include <iomanip>
+
+using namespace std;
+using std::cout;
+using std::endl;
+
+void Validador();
+void Regresion_Lineal (double* , double* , int);
+
+/****************************************************************************************************************************/
+
+int main()
+{
+ Validador();
+ cout<<"\n\n";  system("pause");
+ return 0;
+}
+/****************************************************************************************************************************/
+
+void Validador()
+{
+ //Tema 1
+ double X[]= { 7.5, 9.0, 10.5, 12.0, 14.0, 16.0, 18.0, 20.5, 23.5, 27.0};
+ double Y[]= { 450, 425, 400 , 350 , 325 , 300 , 290 , 280 , 260 , 200 };
+ 
+ int tX = 0, tY = 0, m = 0 , n = 0;
+ int i = 0, j = 0, dif = 0;
+
+ tX = sizeof( X ); m = tX/8;  tY = sizeof( Y ); n = tY/8;
+ cout<<"\nEl numero de bytes en el arreglo A es "<<tX;
+ cout<<"\nPor lo tanto el vector X tiene "<<m<<" casillas";
+ cout<<"\n\nEl numero de bytes en el arreglo B es "<<tY;
+ cout<<"\nPor lo tanto el vector Y tiene "<<n<<" casillas";
+
+ //para verificar que los valores de x son diferentes entre si
+ for(i=0;i<m-1;i++)
+ {
+  for(j=i+1;j<m;j++)
+   {
+    if(X[i]==X[j]) {dif=1; i=m;}
+   }
+ }
+  
+ //Si cumple condiciones invocamos el subprograma de Regresion Lineal
+ if((m==n)&&(dif==0)) {  Regresion_Lineal (X , Y, m); }
+ else
+ {
+   if(m!=n){cout<<"\n\nLa cantidad de elementos en los vectores X e Y son diferentes. FIN DEL PROGRAMA"; }
+   if(dif!=0){ cout<<"\n\nHay valores de X que NO son diferentes. FIN DEL PROGRAMA"; }
+ }
+}
+
+/****************************************************************************************************************************/
+void Regresion_Lineal (double *X , double *Y , int m )
+{
+ double *XY, *X2, *VST, *VSR;
+ int i;
+ double sumaX=0.0, Xtrazo=0.0, sumaY=0.0, Ytrazo=0.0, sumaXY=0.0, sumaX2=0.0;
+ double a1, a2, a3, a4, a5, N, D, b0, b1;
+ double ST=0.0, Sy, SR=0.0, Syx;
+ double r2=0.0 , r=0.0;
+
+ cout.precision(8);
+
+ 
+  //vamos a hacer la regresion lineal sinmple
+  XY = new (nothrow) double[m];  X2 = new (nothrow) double[m];
+  VST = new (nothrow) double[m]; VSR = new (nothrow) double[m];
+
+  for(i=0;i<m;i++) {XY[i]= X[i]*Y[i]; X2[i]= X[i]*X[i];}
+  for(i=0;i<m;i++) {cout<<"\nXY["<<i<<"]="<<XY[i];} cout<<"\n";
+  for(i=0;i<m;i++) {cout<<"\nX2["<<i<<"]="<<X2[i];}
+
+  for(i=0;i<m;i++) //para posteriormente calcular promedios
+  {
+   sumaX = sumaX + X[i] ;    sumaY = sumaY + Y[i];
+   sumaXY = sumaXY + XY[i];  sumaX2 = sumaX2 + X2[i];
+  }
+
+  Xtrazo = sumaX / m; cout<<"\n\nXtrazo = "<<Xtrazo;
+  Ytrazo = sumaY / m; cout<<"\nYtrazo = "<<Ytrazo;
+  cout<<"\nsumaXY = "<<sumaXY;   cout<<"\nsumaX = "<<sumaX; cout<<"\nsumaX2 = "<<sumaX2;
+
+  a1 = Ytrazo * sumaX; N = sumaXY - a1;
+  a2 = Xtrazo * sumaX; D = sumaX2 - a2;
+  cout<<"\na1 = "<<a1;   cout<<"\nN = "<<N; cout<<"\na2 = "<<a2;  cout<<"\nD = "<<D;
+
+  b1 = N / D;    a3 = b1 * Xtrazo;  b0 = Ytrazo - a3;
+  cout<<"\nb1 = "<<b1;   cout<<"\na3 = "<<a3; cout<<"\nb0 = "<<b0;
+
+  cout<<"\n\nPor lo tanto, el ajuste con minimos cuadrados es (la ecuacion de la recta) : ";
+  if(b0>=0) {cout<<"\n\ny = "<<b1<<"x + "<<b0;}
+  if(b0<0)  {cout<<"\n\ny = "<<b1<<"x   "<<b0;}
+
+  //calculo de la desviacion estandar total
+  for(i=0;i<m;i++) { a4 = Y[i]-Ytrazo;  VST[i]= a4*a4; ST = ST + VST[i]; }  // ST = SUMA [(Yi - Ytrazo)2 ]
+  cout<<"\n";
+
+  for(i=0;i<m;i++) {cout<<"\nVST["<<i<<"]="<<VST[i];}
+  cout<<"\n\nST = "<<ST;   Sy = sqrt(ST / (m-1) );    cout<<"\nSy = "<<Sy;
+
+  //calculo del error estandar de aproximacion
+  for(i=0;i<m;i++) { a5 = (Y[i]-b0-(b1*X[i]));  VSR[i]= a5*a5; SR = SR + VSR[i]; }  // SR = SUMA [(Yi - b0- (b1*Xi))2 ]
+  cout<<"\n";
+
+  for(i=0;i<m;i++) {cout<<"\nVSR["<<i<<"]="<<VSR[i];}
+  cout<<"\n\nSR = "<<SR;   Syx = sqrt(SR / (m-2) );    cout<<"\nSy/x = "<<Syx;
+
+  //veredicto sobre la aproximacion
+  if(Syx<Sy){cout<<"\n\nLa aproximacion SI se considera aceptable";}
+  else{cout<<"\n\nLa aproximacion NO se considera aceptable";}
+
+  //calculo de r^2 y de r
+  r2 = (ST-SR)/ST;  r = sqrt(r2); cout<<"\n\nr2 = "<<r2; cout<<"\nr = "<<r;
+  cout<<setprecision(6)<<"\n\nEl modelo lineal explica el "<<r2*100<<"% de la incertidumbre original";
+
+}
