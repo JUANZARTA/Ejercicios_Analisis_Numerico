@@ -1,0 +1,127 @@
+#include <iostream>
+#include <stdlib.h>
+#include <math.h>
+
+using namespace std;
+using std::cout;
+using std::endl;
+
+void lecturas(double* , double* , double* , int*);
+void muller(double , double , double , int);
+double eval_funcion(double);
+/****************************************************************************/
+
+int main()
+{
+ double vx0 , vx1 , vx2;
+ int vn ;
+ lecturas(&vx0 , &vx1 , &vx2 , &vn);
+ muller(vx0 , vx1 , vx2 , vn);
+
+ return 0;
+}
+/****************************************************************************/
+
+void lecturas(double *X0 , double *X1, double *X2, int *N)
+{
+ cout<<" - M U L L E R - "<<endl;
+ cout<<"Digite el valor X0 : "; cin>>*X0;
+ cout<<"Digite el valor X1 : "; cin>>*X1;
+ cout<<"Digite el valor X2 : "; cin>>*X2;
+ cout<<"Digite el numero de iteraciones : "; cin>>*N;
+
+ while(*N<=2)
+ {
+  cout<<"La cantidad de iteraciones debe ser positiva (>2) "<<endl;
+  cout<<"Digite el numero de iteraciones : "; cin>>*N;
+ }
+}
+/****************************************************************************/
+void muller(double X0, double X1, double X2, int N)
+{
+ double TOL=0.000000001, efX0 , efX1 , efX2;
+ double h1 , h2 , d1 , d2 , a , D , E , h , p;
+ double b , Z , srD , k1, k2 , xh, Er;
+ int i;
+ cout.precision(10);
+
+//evaluacion INICIAL de la expresion particular
+ efX0 = eval_funcion(X0);   efX1 = eval_funcion(X1);   efX2 = eval_funcion(X2);
+
+//El "paso 1"
+ h1 = X1 - X0; h2 = X2 - X1;
+ d1 = (efX1 - efX0)/h1; d2 = (efX2 - efX1)/h2;
+ a = (d2 - d1)/(h2 + h1);
+ i = 2;
+
+ cout<<"\n"<<"n"<<"\t"<<"Raiz"<<"\t\t\t\t"<<"f(raiz)"<<"\t\t\t"<<"COTA DE ERROR";
+
+ while(i <= N) //El "paso 2"
+ {
+  //El "paso 3"
+  b = d2 + (h2*a);
+  Z = 4*efX2*a;   srD = (b*b)-Z;   D = sqrt(srD);
+
+  k1 = b-D; if(k1<0) k1=k1*(-1);
+  k2 = b+D; if(k2<0) k2=k2*(-1);
+
+  //El "paso 4"
+  if(k1<k2){ E = b+D;}
+  else { E = b-D;}
+
+  //El "paso 5"
+  h = (-2*efX2)/E;  p = X2 + h;
+
+  //El "paso 6"
+  Er = (p - X2)/p;  if(Er<0){Er=Er*(-1);}
+  
+  //Para mostrar resultados iteracion a iteracion
+  //cout<<"\n"<<i<<"\t"<<X2<<"\t"<<efX2<<"\t\t\t"<<Er;
+
+  //presentacion de resultados iteracion a iteracion 
+  cout<<"\n"<<i<<"\t";
+  std::cout.setf( std::ios::fixed, std:: ios::floatfield );
+  std::cout << X2<<"\t";
+  std::cout.unsetf( std::ios::floatfield );
+  std::cout.precision(10);
+  std::cout<<"\t\t"; std::cout << efX2;
+  std::cout<<"\t\t"; std::cout << Er;
+
+  if (Er<TOL) { cout<<"\nprocedimiento completado satisfactoriamente\n"; system("pause"); exit(1);    }
+
+  //El "paso 7" preparar para la siguiente iteracion
+  X0 = X1; X1 = X2; X2 = p;
+  h1 = X1 - X0; h2 = X2 - X1;
+
+  //evaluacion de la expresion particular
+  efX0 = eval_funcion(X0);  efX1 = eval_funcion(X1);   efX2 = eval_funcion(X2);
+
+  d1 = (efX1 - efX0)/h1; d2 = (efX2 - efX1)/h2;
+  a = (d2 - d1)/(h2 + h1);
+  i = i + 1;
+ }
+
+ //El "paso 8"
+ if((i>N)&&(xh>TOL)) {cout<<"\nEl metodo fracaso despues de "<<N<<" iteraciones";}
+ cout<<"\n"; system("pause");
+}
+/****************************************************************************/
+// f(x) =  19x^6 + 3500x^5 + 426x^4 − 170x^3  
+//Entradas a probar para Raiz 1 : a = -0.4 , b = -0.2 C = 0
+//Entradas a probar para Raiz 2 : a = -0.1 , b = 0, c = 0.1
+//Entradas a probar para Raiz 3 : a = 0.1 , b = 0.15, c = 0.2
+//Entradas a probar para Raiz 4 : a = -185 , b = -184.5, c = -184
+double eval_funcion(double x)
+{
+   double a=0.0;
+   double b=0.0;
+   double c=0.0;
+   double d=0.0;
+   double r=0.0;
+   a = (19*x*x*x*x*x*x);
+   b = (3500*x*x*x*x*x);
+   c = (426*x*x*x*x);
+   d = (170*x*x*x);
+   r = a+b+c-d;
+   return r;
+}
