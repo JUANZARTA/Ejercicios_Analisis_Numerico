@@ -1,0 +1,151 @@
+#include <iostream>
+#include <stdlib.h>
+#include <math.h>
+
+using namespace std;
+using std::cout;
+using std::endl;
+
+void simpson_un_tercio();
+void leer_limites(double * , double *);
+void leer_segmentos(int *);
+void tabla_funcion(double * , double *, double, double , double);
+double mapeo_funcion(double);
+
+/*****************************************************************/
+
+int main()
+{
+ cout<<"M E T O D O   S I M P S O N   ( 1 / 3 )\n\n";
+ simpson_un_tercio();
+ cout<<"\n";  system("pause");
+ return 0;
+}
+/*****************************************************************/
+
+void simpson_un_tercio()
+{
+ double X[5000]= {0};
+ double Y[5000]= {0};
+ double a=0.0 , b=0.0, suma_Y = 0.0, suma_Ypares = 0.0 , suma_Yimpares = 0.0, integral = 0.0; 
+ int i , N;
+ cout.precision(10);
+
+ leer_limites(&a, &b); cout<<"Limites leidos. a = "<<a<<" , b = "<<b<<"\n\n";
+
+ leer_segmentos(&N); cout<<"\nSegmentos leidos. N = "<<N<<endl;
+  
+ tabla_funcion(X, Y, N, a, b);
+ 
+ for(i=1; i<N; i=i+2)  {   suma_Yimpares = suma_Yimpares + Y[i];  }
+ for(i=2; i<N; i=i+2)  {   suma_Ypares = suma_Ypares + Y[i];  }
+ suma_Yimpares = 4 * suma_Yimpares;
+ suma_Ypares = 2 * suma_Ypares;
+ suma_Y = Y[0] + suma_Yimpares + suma_Ypares + Y[N];
+ cout<<"Suma de las Y = "<<suma_Y<<endl;
+ integral = ((b - a)/(3*N)) * suma_Y;
+ cout<<"I N T E G R A L  =  "<<integral<<endl;
+}
+/*****************************************************************/
+
+void leer_limites(double *a , double *b)
+{
+  //Ejemplo 1: a = 0.0;    b = 1.0;
+  //Ejemplo 2: a = 0.0;    b = 1.04719755;
+  //Ejemplo 3: a = 0.0;    b = 0.8;
+  //Ejemplo 4: a = 0.0;    b = 3.14159265359;
+  //Ejemplo 5: a = 1.0;    b = 2.71828182846;
+  cout<<"Limite Inferior (a) : "; cin>>*a;
+  cout<<"Limite Superior (b) : "; cin>>*b;
+  while(*a>=*b)
+  {
+   cout<<"\nEl limite inferior (a) debe ser MENOR que el limite superior (b)";
+   cout<<"\nLimite Inferior (a) : "; cin>>*a;
+   cout<<"Limite Superior (b) : "; cin>>*b;
+  }
+}
+/*****************************************************************/
+
+void leer_segmentos (int *N)
+{
+  int division = 0 , residuo = 0, sw = 0;
+  cout<<"Cantidad de segmentos : ";  cin>>*N;
+
+  division = *N/2;
+  residuo = *N - (division * 2);
+  
+  while( (*N<=0) || (residuo!=0) )
+  {
+   if(*N<=0)
+   {
+     sw = 1;
+     cout<<"La cantidad de segmentos debe ser POSITIVA";
+     cout<<"\n\nCantidad de segmentos: ";  cin>>*N;
+   }
+   
+   division = *N/2;
+   residuo = *N - (division * 2);
+
+   if(sw == 0)
+   {
+     if (residuo!=0)
+     {
+       cout<<"La cantidad de segmentos debe ser PAR";
+       cout<<"\n\nCantidad de segmentos: ";  cin>>*N;
+     }
+   }
+   
+   sw = 0;
+  }
+}
+/*****************************************************************/
+
+void tabla_funcion (double *X, double *Y, double N, double A, double B)
+{
+ double h = 0.0, resultado = 0.0;
+ int i;
+
+ h = (B - A) / N;
+
+ X[0] = A;  
+ resultado = mapeo_funcion(X[0]);   
+ Y[0] = fabs(resultado);
+
+ for(i=1; i<=N; i++)
+ {
+  X[i] = X[i-1] + h;
+  resultado = mapeo_funcion(X[i]);
+  Y[i] = fabs(resultado);
+ }
+}
+/*****************************************************************/
+//F(x)
+/*
+double mapeo_funcion(double X)
+{
+double aux = 0.0 , aux2 = 0.0, valor = 0.0; 
+ aux2 = 2.5*pow(X,3);
+ aux = pow(2.71828182846,X/2);
+ valor = aux2/aux;
+ return valor;
+}
+*/
+// G(x)
+/*
+double mapeo_funcion(double X)
+{
+double aux = 0.0 , valor = 0.0; 
+ valor = sin(X);
+ return valor;
+}
+*/
+//F(x)-G(x)
+
+double mapeo_funcion(double X)
+{
+double aux = 0.0 , aux2 = 0.0, valor = 0.0; 
+ aux2 = 2.5*pow(X,3);
+ aux = pow(2.71828182846,X/2);
+ valor = aux2/aux-sin(X);
+ return valor;
+}
